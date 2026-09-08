@@ -1,0 +1,77 @@
+[
+  {
+    "id": "edu-001",
+    "category": "educacao",
+    "question": "O que é uma biblioteca escolar?",
+    "options": [
+      "Um depósito de materiais de limpeza",
+      "Uma sala exclusiva para professores",
+      "Um espaço de recursos e aprendizagem dentro de uma escola",
+      "Um local usado apenas para provas"
+    ],
+    "correctAnswer": "C",
+    "difficulty": "easy",
+    "points": 100,
+    "explanation": "A biblioteca escolar é um espaço de aprendizagem que oferece recursos físicos e digitais para alunos e professores."
+  },
+  {
+    "id": "edu-002",
+    "category": "educacao",
+    "question": "O que caracteriza um 'recurso educacional digital'?",
+    "options": [
+      "Qualquer conteúdo impresso",
+      "Apenas jogos eletrônicos",
+      "Somente softwares de escritório",
+      "Conteúdo pedagógico disponibilizado em formato digital, como vídeos e e-books"
+    ],
+    "correctAnswer": "D",
+    "difficulty": "easy",
+    "points": 100,
+    "explanation": "Recursos educacionais digitais incluem vídeos, e-books, artigos e outros materiais usados para apoiar o ensino e a aprendizagem."
+  },
+  {
+    "id": "edu-005",
+    "category": "educacao",
+    "question": "Plataformas de vídeo educacional, como o Learn360, são geralmente utilizadas por escolas para:",
+    "options": [
+      "Oferecer acesso a vídeos e conteúdos curriculares organizados por tema",
+      "Substituir a biblioteca física",
+      "Gerenciar a folha de pagamento dos professores",
+      "Fazer a segurança do prédio escolar"
+    ],
+    "correctAnswer": "A",
+    "difficulty": "medium",
+    "points": 200,
+    "explanation": "Plataformas como o Learn360 disponibilizam vídeos e materiais audiovisuais organizados para apoiar o currículo escolar."
+  },
+  {
+    "id": "edu-006",
+    "category": "educacao",
+    "question": "O Lightbox é uma plataforma voltada principalmente para:",
+    "options": [
+      "Gerenciamento de folha de pagamento escolar",
+      "Livros digitais interativos",
+      "Transporte escolar",
+      "Segurança do prédio escolar"
+    ],
+    "correctAnswer": "B",
+    "difficulty": "medium",
+    "points": 200,
+    "explanation": "O Lightbox é uma plataforma de livros digitais interativos, usada para enriquecer a experiência de leitura dos estudantes."
+  },
+  {
+    "id": "edu-010",
+    "category": "educacao",
+    "question": "Qual é um desafio comum ao integrar recursos digitais de aprendizagem ao currículo escolar?",
+    "options": [
+      "Não existem desafios",
+      "Os recursos digitais nunca funcionam em sala de aula",
+      "Garantir que o conteúdo esteja alinhado aos objetivos pedagógicos e seja acessível a todos os alunos",
+      "Professores não podem usar tecnologia"
+    ],
+    "correctAnswer": "C",
+    "difficulty": "hard",
+    "points": 300,
+    "explanation": "Um dos principais desafios é alinhar os recursos digitais aos objetivos pedagógicos e garantir acesso equitativo a todos os alunos."
+  }
+]

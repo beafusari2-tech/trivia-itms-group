@@ -1,0 +1,77 @@
+[
+  {
+    "id": "cat-001",
+    "category": "catalogacao",
+    "question": "O que é catalogação bibliográfica?",
+    "options": [
+      "O processo de descrever e organizar recursos de uma coleção",
+      "A criação de campanhas de marketing para a biblioteca",
+      "A limpeza física dos livros",
+      "A contratação de novos bibliotecários"
+    ],
+    "correctAnswer": "A",
+    "difficulty": "easy",
+    "points": 100,
+    "explanation": "Catalogação é o processo de descrever e organizar itens de um acervo para facilitar sua localização e recuperação."
+  },
+  {
+    "id": "cat-003",
+    "category": "catalogacao",
+    "question": "Qual é uma das principais funções de um sistema de gerenciamento de biblioteca?",
+    "options": [
+      "Editar vídeos",
+      "Criar campanhas publicitárias",
+      "Gerenciar o acervo e seus registros",
+      "Editar fotografias"
+    ],
+    "correctAnswer": "C",
+    "difficulty": "easy",
+    "points": 100,
+    "explanation": "Sistemas de gerenciamento de biblioteca (ILS) existem principalmente para organizar o acervo e seus registros bibliográficos."
+  },
+  {
+    "id": "cat-005",
+    "category": "catalogacao",
+    "question": "Por que a padronização dos registros bibliográficos é importante?",
+    "options": [
+      "Porque deixa o catálogo mais bonito",
+      "Porque é exigida por lei em todos os países",
+      "Não é importante",
+      "Para garantir consistência e facilitar a busca entre diferentes sistemas"
+    ],
+    "correctAnswer": "D",
+    "difficulty": "medium",
+    "points": 200,
+    "explanation": "Padrões permitem que registros sejam compartilhados e compreendidos entre diferentes sistemas e instituições."
+  },
+  {
+    "id": "cat-007",
+    "category": "catalogacao",
+    "question": "Ferramentas como o BestMARC são utilizadas por bibliotecas principalmente para:",
+    "options": [
+      "Emprestar livros para os usuários",
+      "Analisar e melhorar a qualidade dos registros bibliográficos",
+      "Imprimir etiquetas de identificação",
+      "Gerenciar o orçamento da biblioteca"
+    ],
+    "correctAnswer": "B",
+    "difficulty": "medium",
+    "points": 200,
+    "explanation": "O BestMARC, da Mitinet, é utilizado por bibliotecas para analisar e aprimorar a qualidade de seus registros bibliográficos e metadados."
+  },
+  {
+    "id": "cat-009",
+    "category": "catalogacao",
+    "question": "Qual é um dos principais benefícios de manter registros bibliográficos com metadados enriquecidos (como capas, resumos e sumários)?",
+    "options": [
+      "Melhorar a experiência de descoberta e o engajamento do usuário com o catálogo",
+      "Reduzir o tamanho do acervo físico",
+      "Eliminar a necessidade de catalogadores",
+      "Diminuir o custo de energia da biblioteca"
+    ],
+    "correctAnswer": "A",
+    "difficulty": "hard",
+    "points": 300,
+    "explanation": "Metadados enriquecidos tornam o catálogo mais atrativo e ajudam o usuário a decidir se um item é relevante para sua pesquisa."
+  }
+]

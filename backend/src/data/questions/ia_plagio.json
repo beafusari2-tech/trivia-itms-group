@@ -1,0 +1,77 @@
+[
+  {
+    "id": "ia-001",
+    "category": "ia_plagio",
+    "question": "O que caracteriza o plágio?",
+    "options": [
+      "Apresentar ideias ou textos de outra pessoa como se fossem próprios, sem dar crédito",
+      "Citar corretamente a fonte de uma informação",
+      "Fazer uma pesquisa bibliográfica",
+      "Usar aspas para uma citação direta"
+    ],
+    "correctAnswer": "A",
+    "difficulty": "easy",
+    "points": 100,
+    "explanation": "Plágio é apresentar trabalho, ideias ou palavras de outra pessoa sem a devida atribuição."
+  },
+  {
+    "id": "ia-003",
+    "category": "ia_plagio",
+    "question": "O que é uma paráfrase?",
+    "options": [
+      "Copiar um texto exatamente como está, sem citar",
+      "Traduzir um texto para outro idioma",
+      "Resumir um texto em uma única frase",
+      "Reescrever uma ideia com suas próprias palavras, mantendo o sentido original"
+    ],
+    "correctAnswer": "D",
+    "difficulty": "easy",
+    "points": 100,
+    "explanation": "Parafrasear é reescrever uma ideia com palavras próprias, preservando o significado original, e mesmo assim é necessário citar a fonte."
+  },
+  {
+    "id": "ia-006",
+    "category": "ia_plagio",
+    "question": "Qual é uma forma responsável de usar a inteligência artificial na escrita acadêmica?",
+    "options": [
+      "Copiar o texto gerado pela IA e entregá-lo como autoria própria",
+      "Pedir para a IA fazer todo o trabalho sem revisão",
+      "Usar a IA como apoio para organizar ideias, revisar ou pesquisar, mantendo a autoria e o pensamento crítico do autor",
+      "Evitar completamente qualquer tipo de tecnologia"
+    ],
+    "correctAnswer": "C",
+    "difficulty": "medium",
+    "points": 200,
+    "explanation": "A IA pode ser uma aliada na escrita quando usada como ferramenta de apoio, sem substituir a autoria e o pensamento crítico do estudante."
+  },
+  {
+    "id": "ia-008",
+    "category": "ia_plagio",
+    "question": "Ferramentas de análise de similaridade e de indícios de uso de IA, como as oferecidas pelo Compilatio, servem principalmente para:",
+    "options": [
+      "Substituir a avaliação do professor",
+      "Auxiliar na identificação de trechos que precisam de revisão ou verificação humana",
+      "Reprovar automaticamente qualquer aluno",
+      "Reescrever o trabalho do aluno"
+    ],
+    "correctAnswer": "B",
+    "difficulty": "medium",
+    "points": 200,
+    "explanation": "Essas ferramentas fornecem indícios e relatórios que devem ser interpretados por um avaliador humano, e não substituem essa análise."
+  },
+  {
+    "id": "ia-009",
+    "category": "ia_plagio",
+    "question": "Por que a análise humana continua sendo essencial mesmo quando se utilizam ferramentas automáticas de detecção de similaridade ou de conteúdo gerado por IA?",
+    "options": [
+      "Porque essas ferramentas indicam padrões e probabilidades, mas o julgamento sobre contexto e intenção exige interpretação humana",
+      "Porque as ferramentas nunca funcionam",
+      "Porque é apenas uma exigência burocrática",
+      "Porque as ferramentas substituem totalmente o professor"
+    ],
+    "correctAnswer": "A",
+    "difficulty": "hard",
+    "points": 300,
+    "explanation": "Ferramentas automáticas apontam indícios, mas cabe ao avaliador humano interpretar o contexto, a intenção e decidir sobre eventuais problemas de integridade."
+  }
+]
