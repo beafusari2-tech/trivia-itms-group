@@ -120,14 +120,19 @@ export function listAllParticipantSessionsForExport(
     .all(params) as unknown as AdminSessionRow[];
 }
 
+// Hash bcrypt "morto" (nunca corresponde a nenhuma senha real) usado só para
+// igualar o tempo de resposta quando o usuário não existe. Sem isso, a
+// ausência do bcrypt.compareSync nesse caso faz a resposta voltar bem mais
+// rápido, permitindo inferir por timing quais usernames existem.
+const DUMMY_HASH = "$2a$12$C6UzMDM.H6dfI/f/IKcEeO4mp8m1XoBVvi8lKA3Q4LNVoZobbEP7q";
+
 export function verifyAdminCredentials(username: string, password: string): AdminRow {
   const admin = db.prepare("SELECT * FROM admins WHERE username = ?").get(username) as
     | AdminRow
     | undefined;
-  if (!admin) throw new AppError("Usuário ou senha inválidos.", 401);
 
-  const valid = bcrypt.compareSync(password, admin.password_hash);
-  if (!valid) throw new AppError("Usuário ou senha inválidos.", 401);
+  const valid = bcrypt.compareSync(password, admin?.password_hash ?? DUMMY_HASH);
+  if (!admin || !valid) throw new AppError("Usuário ou senha inválidos.", 401);
 
   return admin;
 }

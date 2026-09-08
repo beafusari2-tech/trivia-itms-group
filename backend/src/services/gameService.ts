@@ -74,8 +74,9 @@ export function startGame(participantId: string, category: CategoryId): { sessio
   const sessionId = uuidv4();
 
   db.prepare(
-    `INSERT INTO game_sessions (id, participant_id, category, status, question_ids, current_index, score, correct_count, answered_count)
-     VALUES (?, ?, ?, 'in_progress', ?, 0, 0, 0, 0)`
+    `INSERT INTO game_sessions
+       (id, participant_id, category, status, question_ids, current_index, score, correct_count, answered_count, current_question_served_at)
+     VALUES (?, ?, ?, 'in_progress', ?, 0, 0, 0, 0, datetime('now'))`
   ).run(sessionId, participantId, category, JSON.stringify(ordered.map((q) => q.id)));
 
   return {
@@ -99,6 +100,17 @@ export function getCurrentQuestion(sessionId: string, participantId: string): Pu
 
   if (session.status !== "in_progress" || session.current_index >= questionIds.length) {
     return { finished: true };
+  }
+
+  // Marca "agora" como o instante em que esta pergunta foi entregue — só na
+  // primeira vez (se já tiver um valor, não sobrescreve). É esse timestamp
+  // do servidor, não o tempo que o cliente diz ter levado, que decide o
+  // bônus de velocidade em submitAnswer; sem essa trava, recarregar a
+  // pergunta repetidamente resetaria o cronômetro a favor do jogador.
+  if (!session.current_question_served_at) {
+    db.prepare("UPDATE game_sessions SET current_question_served_at = datetime('now') WHERE id = ?").run(
+      sessionId
+    );
   }
 
   const questionId = questionIds[session.current_index];
@@ -126,12 +138,23 @@ export function submitAnswer(
 
   const question = db.prepare("SELECT * FROM questions WHERE id = ?").get(questionId) as unknown as QuestionRow;
   const correct = selectedOption !== null && selectedOption === question.correct_answer;
-  const pointsEarned = computePoints(question.points, correct, timeTakenMs);
+
+  // O bônus de velocidade usa o tempo medido pelo SERVIDOR (desde que a
+  // pergunta foi entregue, em getCurrentQuestion/startGame), nunca o
+  // timeTakenMs que o cliente envia — que é só um valor informativo, já que
+  // um participante poderia manipular a requisição e sempre alegar 0ms para
+  // garantir o bônus máximo em todas as respostas.
+  const servedAtMs = session.current_question_served_at
+    ? new Date(session.current_question_served_at.replace(" ", "T") + "Z").getTime()
+    : null;
+  const serverTimeTakenMs = servedAtMs !== null ? Math.max(0, Date.now() - servedAtMs) : timeTakenMs;
+
+  const pointsEarned = computePoints(question.points, correct, serverTimeTakenMs);
 
   db.prepare(
     `INSERT INTO game_answers (session_id, question_id, selected_option, correct, points_earned, time_taken_ms)
      VALUES (?, ?, ?, ?, ?, ?)`
-  ).run(sessionId, questionId, selectedOption, correct ? 1 : 0, pointsEarned, timeTakenMs);
+  ).run(sessionId, questionId, selectedOption, correct ? 1 : 0, pointsEarned, serverTimeTakenMs);
 
   const newIndex = session.current_index + 1;
   const newScore = session.score + pointsEarned;
@@ -164,9 +187,11 @@ export function submitAnswer(
       message: resultMessage(percentage),
     };
   } else {
+    // Zera current_question_served_at para que getCurrentQuestion carimbe um
+    // novo horário quando a próxima pergunta for de fato entregue.
     db.prepare(
       `UPDATE game_sessions
-       SET current_index = ?, score = ?, correct_count = ?, answered_count = ?
+       SET current_index = ?, score = ?, correct_count = ?, answered_count = ?, current_question_served_at = NULL
        WHERE id = ?`
     ).run(newIndex, newScore, newCorrectCount, newAnsweredCount, sessionId);
   }

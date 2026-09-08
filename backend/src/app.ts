@@ -13,6 +13,12 @@ const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 export function createApp() {
   const app = express();
 
+  // A app roda atrás do proxy/load balancer do Render (e de qualquer outro
+  // provedor similar). Sem isso, express-rate-limit usa req.ip, que atrás de
+  // um proxy reverso reflete o IP do proxy — não o do cliente real — o que
+  // esvazia a proteção contra força bruta no login admin e no cadastro.
+  app.set("trust proxy", 1);
+
   app.use(helmet());
   app.use(
     cors({

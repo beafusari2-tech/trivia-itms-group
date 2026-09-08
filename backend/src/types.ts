@@ -36,6 +36,7 @@ export interface ParticipantRow {
   phone: string;
   email: string;
   consent: number;
+  marketing_consent: number;
   created_at: string;
 }
 
@@ -54,6 +55,7 @@ export interface GameSessionRow {
   started_at: string;
   completed_at: string | null;
   total_time_ms: number | null;
+  current_question_served_at: string | null;
 }
 
 export interface GameAnswerRow {

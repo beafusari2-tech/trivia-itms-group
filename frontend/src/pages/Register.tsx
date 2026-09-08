@@ -10,6 +10,7 @@ interface FormState {
   phone: string;
   email: string;
   consent: boolean;
+  marketingConsent: boolean;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,6 +37,7 @@ export default function Register() {
     phone: "",
     email: "",
     consent: false,
+    marketingConsent: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -94,6 +96,7 @@ export default function Register() {
         phone: form.phone.trim(),
         email: form.email.trim(),
         consent: form.consent,
+        marketingConsent: form.marketingConsent,
       });
       saveParticipantSession(token, participant);
       navigate("/categorias");
@@ -179,11 +182,24 @@ export default function Register() {
               className="mt-1 h-4 w-4 shrink-0 accent-accent"
             />
             <span>
-              Concordo em fornecer meus dados para participação na Trivia e para receber
-              informações relacionadas aos produtos e serviços apresentados pela ITMS Group.
+              Concordo em fornecer meus dados (nome, instituição, telefone e e-mail) para
+              participar da Trivia da ITMS Group. *
             </span>
           </label>
           {errors.consent && <p className="text-xs text-accent-dark">{errors.consent}</p>}
+
+          <label className="flex items-start gap-3 text-sm text-ink/70">
+            <input
+              type="checkbox"
+              checked={form.marketingConsent}
+              onChange={(e) => setForm({ ...form, marketingConsent: e.target.checked })}
+              className="mt-1 h-4 w-4 shrink-0 accent-accent"
+            />
+            <span>
+              (Opcional) Aceito receber, por e-mail ou telefone, informações sobre produtos e
+              serviços da ITMS Group.
+            </span>
+          </label>
 
           {submitError && (
             <div className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent-dark">

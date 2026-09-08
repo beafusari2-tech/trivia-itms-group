@@ -23,6 +23,7 @@ export function initSchema(): void {
       phone TEXT NOT NULL,
       email TEXT NOT NULL UNIQUE,
       consent INTEGER NOT NULL DEFAULT 0,
+      marketing_consent INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -52,7 +53,8 @@ export function initSchema(): void {
       answered_count INTEGER NOT NULL DEFAULT 0,
       started_at TEXT NOT NULL DEFAULT (datetime('now')),
       completed_at TEXT,
-      total_time_ms INTEGER
+      total_time_ms INTEGER,
+      current_question_served_at TEXT DEFAULT (datetime('now'))
     );
 
     CREATE TABLE IF NOT EXISTS game_answers (
@@ -77,6 +79,19 @@ export function initSchema(): void {
     CREATE INDEX IF NOT EXISTS idx_answers_session ON game_answers(session_id);
     CREATE INDEX IF NOT EXISTS idx_questions_category ON questions(category);
   `);
+
+  // CREATE TABLE IF NOT EXISTS não adiciona colunas a uma tabela que já
+  // existia de uma versão anterior do schema (relevante se algum dia
+  // houver disco persistente entre deploys). Migração idempotente e segura.
+  ensureColumn("participants", "marketing_consent", "INTEGER NOT NULL DEFAULT 0");
+  ensureColumn("game_sessions", "current_question_served_at", "TEXT DEFAULT (datetime('now'))");
+}
+
+function ensureColumn(table: string, column: string, definition: string): void {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  if (!columns.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
 }
 
 /**

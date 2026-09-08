@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
-import { adminGetParticipants, downloadAdminExport, ApiError } from "../lib/api";
+import { adminGetParticipants, deleteParticipant, downloadAdminExport, ApiError } from "../lib/api";
 import { clearAdminToken, getAdminToken } from "../lib/storage";
 import { AdminSessionRow, CategoryId } from "../lib/types";
 import { CATEGORY_TITLES } from "../lib/categoryMeta";
@@ -18,6 +18,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState<"csv" | "xlsx" | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!getAdminToken()) {
@@ -25,33 +26,56 @@ export default function AdminDashboard() {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(true);
-      setError(null);
-      adminGetParticipants({
-        search: search || undefined,
-        category: category || undefined,
-        page,
-        pageSize: PAGE_SIZE,
+  const loadParticipants = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    return adminGetParticipants({
+      search: search || undefined,
+      category: category || undefined,
+      page,
+      pageSize: PAGE_SIZE,
+    })
+      .then((data) => {
+        setRows(data.rows);
+        setTotal(data.total);
       })
-        .then((data) => {
-          setRows(data.rows);
-          setTotal(data.total);
-        })
-        .catch((err) => {
-          if (err instanceof ApiError && err.status === 401) {
-            clearAdminToken();
-            navigate("/admin/login");
-            return;
-          }
-          setError("Não foi possível carregar os participantes.");
-        })
-        .finally(() => setLoading(false));
-    }, 300);
-
-    return () => clearTimeout(timeout);
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 401) {
+          clearAdminToken();
+          navigate("/admin/login");
+          return;
+        }
+        setError("Não foi possível carregar os participantes.");
+      })
+      .finally(() => setLoading(false));
   }, [search, category, page, navigate]);
+
+  useEffect(() => {
+    const timeout = setTimeout(loadParticipants, 300);
+    return () => clearTimeout(timeout);
+  }, [loadParticipants]);
+
+  async function handleDelete(participantId: string, name: string) {
+    const confirmed = window.confirm(
+      `Excluir permanentemente os dados de "${name}"? Isso remove o cadastro e todo o histórico de jogo dessa pessoa. Essa ação não pode ser desfeita.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(participantId);
+    try {
+      await deleteParticipant(participantId);
+      await loadParticipants();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        clearAdminToken();
+        navigate("/admin/login");
+        return;
+      }
+      setError("Não foi possível excluir este participante.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   async function handleExport(format: "csv" | "xlsx") {
     setExporting(format);
@@ -142,19 +166,20 @@ export default function AdminDashboard() {
                 <th className="px-4 py-3">Acertos</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Data</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-ink/50">
+                  <td colSpan={10} className="px-4 py-8 text-center text-ink/50">
                     Carregando...
                   </td>
                 </tr>
               )}
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-ink/50">
+                  <td colSpan={10} className="px-4 py-8 text-center text-ink/50">
                     Nenhum participante encontrado.
                   </td>
                 </tr>
@@ -174,6 +199,16 @@ export default function AdminDashboard() {
                     <td className="px-4 py-3 capitalize">{row.status.replace("_", " ")}</td>
                     <td className="px-4 py-3">
                       {new Date(row.startedAt.replace(" ", "T") + "Z").toLocaleString("pt-BR")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        className="text-xs font-semibold text-accent-dark hover:underline disabled:opacity-50"
+                        disabled={deletingId === row.participantId}
+                        onClick={() => handleDelete(row.participantId, row.name)}
+                        title="Excluir dados deste participante (LGPD)"
+                      >
+                        {deletingId === row.participantId ? "Excluindo..." : "Excluir"}
+                      </button>
                     </td>
                   </tr>
                 ))}

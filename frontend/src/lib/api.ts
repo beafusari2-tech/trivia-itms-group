@@ -65,6 +65,7 @@ export function registerParticipant(input: {
   phone: string;
   email: string;
   consent: boolean;
+  marketingConsent: boolean;
 }): Promise<{ token: string; participant: Participant }> {
   return request("/participants", { method: "POST", body: JSON.stringify(input) });
 }
@@ -130,6 +131,10 @@ export function adminGetParticipants(params: {
   if (params.page) query.set("page", String(params.page));
   if (params.pageSize) query.set("pageSize", String(params.pageSize));
   return request(`/admin/participants?${query.toString()}`, { auth: "admin" });
+}
+
+export function deleteParticipant(participantId: string): Promise<void> {
+  return request(`/admin/participants/${participantId}`, { method: "DELETE", auth: "admin" });
 }
 
 export async function downloadAdminExport(

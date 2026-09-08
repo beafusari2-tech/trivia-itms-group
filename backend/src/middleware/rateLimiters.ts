@@ -23,3 +23,14 @@ export const gameLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Muitas requisições. Aguarde um instante." },
 });
+
+// Endpoints públicos e sem custo computacional relevante (ranking,
+// categorias) não tinham nenhum limite — protege contra scraping/spam
+// grosseiro sem incomodar uso legítimo.
+export const publicReadLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Muitas requisições. Aguarde um instante." },
+});

@@ -1,10 +1,12 @@
 import { Router } from "express";
+import { z } from "zod";
 import { adminLoginSchema, adminParticipantsQuerySchema } from "../utils/validation";
 import {
   listAllParticipantSessionsForExport,
   listParticipantSessions,
   verifyAdminCredentials,
 } from "../services/adminService";
+import { deleteParticipant } from "../services/participantService";
 import { signAdminToken } from "../utils/token";
 import { adminLoginLimiter } from "../middleware/rateLimiters";
 import { AuthedRequest, requireAdmin } from "../middleware/auth";
@@ -31,6 +33,20 @@ adminRouter.get("/participants", (req: AuthedRequest, res, next) => {
     const { search, category, page, pageSize } = adminParticipantsQuerySchema.parse(req.query);
     const { rows, total } = listParticipantSessions({ search, category, page, pageSize });
     res.json({ rows, total, page, pageSize });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const participantIdParamSchema = z.object({ id: z.string().uuid() });
+
+// Exclusão de dados pessoais a pedido do titular (LGPD art. 18). Remove o
+// participante e todo o histórico de jogo associado.
+adminRouter.delete("/participants/:id", (req: AuthedRequest, res, next) => {
+  try {
+    const { id } = participantIdParamSchema.parse(req.params);
+    deleteParticipant(id);
+    res.status(204).end();
   } catch (err) {
     next(err);
   }
@@ -65,11 +81,11 @@ adminRouter.get("/export.csv", (req: AuthedRequest, res, next) => {
   }
 });
 
-adminRouter.get("/export.xlsx", (req: AuthedRequest, res, next) => {
+adminRouter.get("/export.xlsx", async (req: AuthedRequest, res, next) => {
   try {
     const { search, category } = adminParticipantsQuerySchema.parse(req.query);
     const rows = listAllParticipantSessionsForExport({ search, category });
-    const buffer = buildXlsx(toExportRows(rows));
+    const buffer = await buildXlsx(toExportRows(rows));
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

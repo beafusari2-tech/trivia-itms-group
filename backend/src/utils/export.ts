@@ -1,8 +1,7 @@
-// Usamos apenas XLSX.write / json_to_sheet para GERAR planilhas a partir dos
-// nossos próprios dados. Nunca chamamos XLSX.read/readFile sobre arquivos de
-// terceiros, que é a superfície afetada pelas CVEs conhecidas do SheetJS
-// (prototype pollution / ReDoS no parser).
-import * as XLSX from "xlsx";
+// exceljs gera a planilha inteiramente a partir dos nossos próprios dados
+// (nunca abrimos um arquivo .xlsx de terceiros), então não há superfície de
+// parsing de arquivo externo a proteger aqui.
+import ExcelJS from "exceljs";
 
 export interface ParticipantExportRow {
   name: string;
@@ -32,8 +31,16 @@ const HEADERS = [
   "Data/Hora do Cadastro",
 ];
 
+// CSV/Formula injection: um campo começando com =, +, - ou @ pode ser
+// interpretado como fórmula pelo Excel ao abrir o arquivo (ex: telefone em
+// formato internacional começa com "+"). Prefixar com aspas simples
+// neutraliza sem alterar o valor visualmente para quem abre a planilha.
+function neutralizeFormula(value: string): string {
+  return /^[=+\-@]/.test(value) ? `'${value}` : value;
+}
+
 function escapeCsvField(value: string | number): string {
-  const str = String(value);
+  const str = neutralizeFormula(String(value));
   if (/[",\n;]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`;
   }
@@ -65,24 +72,30 @@ export function buildCsv(rows: ParticipantExportRow[]): string {
   return "﻿" + lines.join("\r\n");
 }
 
-export function buildXlsx(rows: ParticipantExportRow[]): Buffer {
-  const data = rows.map((r) => ({
-    Nome: r.name,
-    Instituição: r.institution,
-    Telefone: r.phone,
-    "E-mail": r.email,
-    Categoria: r.category,
-    Pontuação: r.score,
-    Acertos: r.correctAnswers,
-    "Perguntas Respondidas": r.questionsAnswered,
-    "Tempo Total (s)": r.totalTimeSeconds,
-    Status: r.status,
-    "Data/Hora do Cadastro": r.createdAt,
-  }));
+export async function buildXlsx(rows: ParticipantExportRow[]): Promise<Buffer> {
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Participantes");
 
-  const worksheet = XLSX.utils.json_to_sheet(data, { header: HEADERS.map((h) => h) });
-  // json_to_sheet infers headers from object keys already in the right order above.
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Participantes");
-  return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
+  sheet.columns = HEADERS.map((header) => ({ header, key: header }));
+
+  for (const r of rows) {
+    sheet.addRow({
+      Nome: neutralizeFormula(r.name),
+      Instituição: neutralizeFormula(r.institution),
+      Telefone: neutralizeFormula(r.phone),
+      "E-mail": neutralizeFormula(r.email),
+      Categoria: r.category,
+      Pontuação: r.score,
+      Acertos: r.correctAnswers,
+      "Perguntas Respondidas": r.questionsAnswered,
+      "Tempo Total (s)": r.totalTimeSeconds,
+      Status: r.status,
+      "Data/Hora do Cadastro": r.createdAt,
+    });
+  }
+
+  sheet.getRow(1).font = { bold: true };
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buffer);
 }

@@ -41,9 +41,13 @@ export const registerParticipantSchema = z.object({
       { message: "Informe um telefone válido, com DDD." }
     ),
   email: z.string().trim().email("Informe um e-mail válido.").max(150, "E-mail muito longo (máximo 150 caracteres)."),
+  // Consentimento de participação (obrigatório) e de marketing (opcional)
+  // são finalidades diferentes — LGPD exige consentimento específico por
+  // finalidade, então não podem ser um único checkbox.
   consent: z.literal(true, {
     errorMap: () => ({ message: "É necessário concordar com o uso dos dados para continuar." }),
   }),
+  marketingConsent: z.boolean().optional().default(false),
 });
 
 export const startGameSchema = z.object({

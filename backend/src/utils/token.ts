@@ -1,8 +1,20 @@
 import jwt from "jsonwebtoken";
 import { AdminTokenPayload, ParticipantTokenPayload } from "../types";
 
-const PARTICIPANT_SECRET = process.env.JWT_PARTICIPANT_SECRET || "dev-participant-secret";
-const ADMIN_SECRET = process.env.JWT_ADMIN_SECRET || "dev-admin-secret";
+// Sem fallback: um segredo hardcoded no código-fonte deixa de proteger nada
+// no momento em que o repositório existe. Se a env var faltar, é melhor a
+// aplicação recusar subir do que rodar silenciosamente com um segredo
+// previsível/público.
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`[token] Variável de ambiente obrigatória ausente: ${name}`);
+  }
+  return value;
+}
+
+const PARTICIPANT_SECRET = requireEnv("JWT_PARTICIPANT_SECRET");
+const ADMIN_SECRET = requireEnv("JWT_ADMIN_SECRET");
 
 export function signParticipantToken(payload: ParticipantTokenPayload): string {
   return jwt.sign(payload, PARTICIPANT_SECRET, { expiresIn: "12h" });
